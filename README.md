@@ -1,7 +1,7 @@
 # React-Redux Fundamentals
 <a href='https://facebook.github.io/react/'><img src="https://react-etc.net/files/2016-07/logo-578x270.png" alt="React Logo" height="50"></a> 
 <a href='https://jsx.github.io/'><img src="https://camo.githubusercontent.com/2b0b2c776d6cba46731b722570bdef902dd213d2/687474703a2f2f692e696d6775722e636f6d2f58636637692e706e67" alt="JSX's proposed logo" height="50"></a> 
-<a href='https://jsx.github.io/'><img src="https://frontendmasters.com/assets/es6-logo.png" alt="JSX's proposed logo" height="50"></a> 
+<a href='https://jsx.github.io/'><img src="https://frontendmasters.com/assets/es6-logo.png" alt="ES6" height="50"></a> 
 
 Notes on the fundamentals of React and  handing state in Redux. Created in my free time for the benefit of my team at TD and me to more easily adopt React.
 
