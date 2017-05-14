@@ -78,3 +78,122 @@ If you're unfamiliar with JS6, it's highly recommended you at least learn about 
 If you're worried about browser compatibility, don't sweat it. That's why [Babel](https://babeljs.io/) works so closely with React, ensuring your code, whether it be ES6, ES7, or JSX,  gets transpiled to ye old ES5. Babel is an essential part of your build process when using React.
 
 You may use TypeScript instead, which also has many key features of ES6, but you're going to have a hard time while learning. Assuming you don't also know ES6, having to rely on tutorials that only teach React and TypeScript tgoether will significantly limit the resources you have to learn from. It is recommended you learn React with ES6 first, and then once you're comfortable with how React and ES6 fundamentally works, start using TypeScript. That way you can still learn from the vast resources and examples that use ES6, while avoiding any errors where you're confused if you're using React or TypeScript incorrectly.
+
+
+## React Basics
+
+Note that there are more ways than the ones specified here to implement components. These are suggestions.
+
+### Concept: Components
+
+React relies on the concept that many "components" aggregate together to make a whole application. Those components may be comprised of smaller components! [Facebook's tutorial](https://facebook.github.io/react/tutorial/tutorial.html) is a great way to understand this basic principle. 
+
+For every component, there should be a different JavaScript file. This encourages modularity and ensures things don't get messy. Your application's directory structure should look something like:
+```
+my-first-react-application
+	components
+    	introduction.js
+        about.js
+        projects.js
+        contact.js
+	index.js
+    README.md
+```
+
+index.js should have a component that has child components from the 'components' directory! 
+
+### React vs ReactDOM
+
+After its inception, React got split into two libraries:
+
+- React: React functionalities utilized in web and mobile apps
+- React DOM: React functionalities utilized for 'gluing' React with the DOM
+
+Why the distinction? The creators hope to use the React library for mobile development while excluding React DOM. At this point in time however, that's more of an aspiration with React Native, a framework for mobile development, being very different from React in implementation. 
+
+
+### Creating an Application and Adding a Component
+
+React first needs to know where you want to put your application on the DOM. So let's create a a specific div just for the application, under the ID, 'container'.
+```
+<html>
+  <header>
+  	<title>Hyun's Awesome Demo</title>
+  </header>
+  <body>
+  	<h1>The new application!</h1>
+    <div id='container'></div>
+  </body>
+</html>
+
+```
+
+Then let's create an index.js file that imports the necessary libraries, and sets a new component to 'container'. The 'import' statement and fat arrows are part of ES6, not React, so remember to learn ES6 before React to understand what is going on.
+```
+// Import the two necessary React libraries
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+// Create a functional component
+const App = () => {return (
+	<div>
+    	<p>Hello there!</p>
+    </div>
+)}
+
+// Tell React where to render the functional component!
+ReactDOM.render(<App />, document.querySelect('#container'));
+
+```
+
+What if it's a more complex application that is comprised of several components? Then you'll want to import the components you made  from the components directory!
+
+Let's say you created components/projects.js. In order to export your projects, you'll create something like:
+
+```
+import React from 'react';
+// We aren't importing ReactDOM because we're rendering this component in index.js
+
+let projects = () => <div>Lets pretend my projects are listed here</div>
+export default projects;
+```
+
+Then in index.js, you'll import projects.js and then include it.
+
+```
+// Import the two necessary React libraries
+import React from 'react';
+import ReactDOM from 'react-dom';
+import projects from './components/projects.js';
+
+const App = () => {return (
+	<div>
+    	<p>Hello there!</p>
+        <projects /> // Ta-da! We added a component to our application! Go modularity!
+    </div>
+)}
+
+ReactDOM.render(<App />, document.querySelect('#container'));
+
+```
+
+
+### Kinds of Components
+	
+Functional Component: Literally a function; some input goes in, JSX comes out. Consider that these components will never change in what they initially look like.
+```
+const title = () => <h2>This component will never change!</h2>
+```
+
+Class-based Component: A component that has state (ie. some internal record keeping) and/or wants to communicate with other components.
+```
+	// Define a new class, and give it all the functionality of React.Component
+	class FirstName extends React.Component{
+		render() {
+			return <input />
+		}
+	}
+	let nameInstance = new FirstName;
+```
+
+If you're not sure which to use, start with a functional component, and then use a class-based component when you need the additional functionality.
