@@ -5,6 +5,18 @@
 
 Notes on the fundamentals of React and  handing state in Redux. Created in my free time for the benefit of my team at TD and me to more easily adopt React.
 
+## Table of Contents
+
+- [Introduction](#introduction)
+	- [What is React?](#what-is-react)
+	- [How does it compare to Angular?](#how-does-it-compare-to-angular)
+	- [What is JSX?](what-is-jsx)
+	- [What is ES6?](#what-is-es6)
+- [React Basics](#react-basics)
+	- [Components](#components)
+	- [React and ReactDOM](#react-and-reactdom)
+	- [Creating an Application and Adding a Component](#creating-an-application-and-adding-a-component)
+	- [Kinds of Components](#kinds-of-components)
 
 ## Introduction
 
@@ -13,7 +25,7 @@ Notes on the fundamentals of React and  handing state in Redux. Created in my fr
 "React is a declarative, efficient, and flexible JavaScript library for building user interfaces." It is the View in the MVC model.
 
 
-#### How does it compare to Angular?
+### How does React compare to Angular?
 
 When directly contrasting React to a framework like Angular, many people really mean "React + Redux (or any state container) + related technologies." 
 
@@ -69,9 +81,9 @@ let groceries = () => React.createElement(
 
 Without even knowing React or its syntax, that convinced you pretty quick to use JSX, didn't it?
 
-### What is JS6?
+### What is ES6?
 
-EMCAScript 6, a particular newer specification of JavaScript that changed a lot of things for the better, is often referred to as JS6. If you're used to 'regular old' JavaScript, you're probably thinking of ES5 or an older specification. ES6 is also mandatory while using React because React relies on classes and other new features. Many people who share sample code in React will use ES6 liberally -- for good reason!
+EMCAScript 6, a particular newer specification of JavaScript that changed a lot of things for the better, is often referred to as ES6. If you're used to 'regular old' JavaScript, you're probably thinking of ES5 or an older specification. ES6 is also mandatory while using React because React relies on classes and other new features. Many people who share sample code in React will use ES6 liberally -- for good reason!
 
 If you're unfamiliar with JS6, it's highly recommended you at least learn about classes, fat arrows, let, and const before you start with React. [Babel has a great summary of what ES6 offers.](https://babeljs.io/learn-es2015/)
 
@@ -84,9 +96,9 @@ You may use TypeScript instead, which also has many key features of ES6, but you
 
 Note that there are more ways than the ones specified here to implement components. These are suggestions.
 
-### Concept: Components
+### Components
 
-React relies on the concept that many "components" aggregate together to make a whole application. Those components may be comprised of smaller components! [Facebook's tutorial](https://facebook.github.io/react/tutorial/tutorial.html) is a great way to understand this basic principle. 
+React relies on the concept that many "components" aggregate together to make a whole application. Those components may be comprised of smaller components and so on! [Facebook's tutorial](https://facebook.github.io/react/tutorial/tutorial.html) is a great way to understand this basic principle. 
 
 For every component, there should be a different JavaScript file. This encourages modularity and ensures things don't get messy. Your application's directory structure should look something like:
 ```
@@ -100,9 +112,11 @@ my-first-react-application
     README.md
 ```
 
-index.js should have a component that has child components from the 'components' directory! 
+Once you understand the concept of containers, actions, and reducers, you'll want to create seperate directories for those too.
 
-### React vs ReactDOM
+Your index file should have a component that has child components from the 'components' directory! 
+
+### React and ReactDOM
 
 After its inception, React got split into two libraries:
 
@@ -187,13 +201,13 @@ const title = () => <h2>This component will never change!</h2>
 
 Class-based Component: A component that has state (ie. some internal record keeping) and/or wants to communicate with other components.
 ```
-	// Define a new class, and give it all the functionality of React.Component
-	class FirstName extends React.Component{
-		render() {
-			return <input />
-		}
+// Define a new class, and give it all the functionality of React.Component
+class FirstName extends React.Component{
+	render() {
+		return <input />
 	}
-	let nameInstance = new FirstName;
+}
+let nameInstance = new FirstName;
 ```
 
 If you're not sure which to use, start with a functional component, and then use a class-based component when you need the additional functionality.
