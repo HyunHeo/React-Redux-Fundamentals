@@ -463,3 +463,246 @@ var movie = props => {
 }
 ```
 
+
+## Redux
+
+Redux is a library that manages something called the 'application state', just one ol' JavaScript object that contains all the data you need to access and change for your entire application. In contrast, React by itself manages data in localized states for each component. Just to be absolutely clear, React's localized component states and Redux's application state are COMPLETELY different way of managing data and are in no way connected or dependent.
+
+That said, you don't NEED Redux. React alone can get
+any job done without Redux. [In fact, if you are not sure if you need Redux, you don't need Redux.](https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367)
+
+Once the complexity of your application increases too much for comfort or localized states are now threatening the Single Responsibility Principle of components, then you may adopt the pattern of using React to manage the views, and Redux to manage the data. 
+
+[Redux Ecosystem](https://github.com/xgrommx/awesome-redux)
+
+### Reducers
+
+The application state is really an aggregation of smaller JavaScript objects. Each of these smaller JavaScript objects
+can _intuitively_ be called 'reducers'. If you want a particular value from the application state, say 'username', you
+have to reference the appropriate reducer.
+
+For example, we might want to create a reducer that holds all our movies in 'reducers/reducer_movies.js':
+```
+export default function() {
+	return [
+		{ project: 'Finding Nemo' },
+		{ project: 'Finding Nemo 2' },
+		{ project: 'Finding Dory' },
+	]
+}
+
+export default 
+```
+
+Aaaand create another reducer that holds all the users of our website in 'reducers/reducer_users.js':
+```
+export default function() {
+	return [
+		{ user: 'Hyun Heo' },
+		{ user: 'John Doe' },
+		{ user: 'Nob Ody' },
+	]
+}
+
+```
+
+We'll create our application state that combines these reducers in 'reducers/index.js':
+```
+import { combinedReducers } from 'redux'; // Getting the combinedReducers function from redux
+import MoviesReducers from './reducer_movies.js'; 
+import UsersReducer from './reducer_users.js';
+// Note how we didnt assign an actual name in the reducer files above. The default gets exported.
+// We named it however we wanted. 
+
+const rootReducer = combineReducers({
+	movies: MoviesReducers
+	users: UsersReducer 
+})
+
+export default rootReducer;
+	
+})
+```
+
+Remember how I said that the application state is an aggregation of smaller JavaScript objects called reducers? Well... if you look at the code above, it's not really. It is fundamentally a reducer that references other reducers, with the keys being whatever you like. 
+
+### Containers
+
+Reducers are great, but how can do we use them? We'll have to create containers, components that connect with the application state. Containers are also known as 'smart components'.
+
+However, Redux does not come with a way to connect to React's components by itself as there is no dependency between React and Redux! You will need the 'react-redux' library to make that connection. 
+
+Lets adopt our last example of an application that shows movies:
+
+```
+import React, { Component } from 'react';
+import { connect } from 'react-redux'; // This function will make this boring component into a container!
+
+class Movies extends React.Component {
+	
+    // Notice how we're not creating a constructor this time to create a localized React state!
+    // We're going to use the application state instead to get our movies.
+
+	renderMovieList() {
+    	return this.props.movies.map(movie => <li>{movie.name}</li>)
+    }
+
+	render(){
+		return (
+			<div>
+				<ul>
+					{renderMovieList()}
+				</ul>
+			</div>
+		)
+	}
+}
+
+// This will map a specific subset of the application state to a component
+function mapStateToProps(state) {
+	return {
+    	movies: state.movies 
+    }
+}
+
+// Exports the component that is now mapped to a specific subset of the application state 
+export default connect(mapeStateToProps)(Movies); 
+
+```
+
+Yay, we're able to access the existing application state! 
+
+...But how do we modify the application state? Through action creators and modifying these reducers to be even better.
+
+### Action Creators, Actions... and more Reducers
+
+When changing the application state, the process is:
+
+1. From a component, call an action creator.
+2. The action creator creates an action.
+3. The action is dispatched to every reducer.
+4. Each reducer checks if the action wants the particular reducer's properties to change in some way. 
+5. If the application state has any of its reducers' properties changed, the components connected to the reducers re-render with the new properties.
+
+
+Let's create an action creator for picking movies. Every action must specify a 'type' and a 'payload'. Lets create it in 'actions/action_pickMovie.js'.:
+```
+export function pickMovie(movie){
+	return {
+    	type: 'MOVIE_PICKED', // Always uppercase and has underscores!
+        payload: movie
+    }
+}
+```
+
+Let's create a reducer in 'reducers/reducer_pickedMovie.js' to accept the action:
+
+
+```
+export default function(state = null, action) { // state = null is es6 syntax that sets state to null if undefined
+	switch(action.type) {
+		case 'MOVIE_PICKED': 
+			return action.payload; 
+	}
+    
+    return state;
+}
+```
+
+We'll create our application state that combines these reducers in 'reducers/index.js':
+```
+import { combinedReducers } from 'redux'; 
+import MoviesReducer from './reducer_movies.js'; 
+import PickedMovie from './reducer_pickedMovie.js';
+
+const rootReducer = combineReducers({
+	movies: MoviesReducers
+	pickedMovie: PickedMovie 
+})
+
+export default rootReducer;
+```
+
+Let's create the container where you can pick your favourite movie. Note that we should really be pulling a list of movies from a reducer, but this example is starting to be long:
+
+```
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { pickMovie } from '../actions/action_pickMovie.js';
+import {bindActionCreators } from 'redux';  // This will allow the created actions to go through all the reducers
+
+class PickFavMovie extends React.Component {
+
+	render(){
+		return (
+        	<ul>
+            	<li 
+                	// Note that you absolutely need a key for every element you render
+                    // Otherwise React will complain. Keys are used by React to know what
+                    // components to re-render in the future.
+                    key='Finding Nemo' 
+                    onClick={() => this.props.pickMovie('Finding Nemo')}>
+					Finding Nemo
+                </li>
+                <li 
+                    key='Finding Dory'
+                    onClick={() => this.props.pickMovie('Finding Dory')}>
+					Finding Dory
+                </li>
+            </ul>
+		)
+	}
+}
+
+function mapStateToProps(state) {
+	return {
+    	pickedMovie: state.pickedMovie 
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+ 	return bindActionCreators({ pickMovie: pickMovie }, dispatch)
+}
+
+// While exporting the container, set mapDispatchToProps as a prop to allow 
+export default connect(mapeStateToProps, mapDispatchToProps)(FavMovie); 
+```
+
+
+Now, let's create the container that will show your favourite movie:
+
+```
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+
+class PickFavMovie extends React.Component {
+
+	render(){
+    
+    	// Simple check if a movie hasn't been picked yet
+        if (!this.props.pickedMovie){
+        	return <div>You haven't picked a movie yet.</div>
+        }
+    
+		return (
+        	<div>
+            	<h1>Our Fav Movie is: {this.props.favMovie}</h1>
+            </div>
+		)
+	}
+}
+
+function mapStateToProps(state) {
+	return {
+    	pickedMovie: state.pickedMovie 
+    }
+}
+
+export default connect(mapeStateToProps)(FavMovie); 
+```
+
+That was too much code to put in a README file. Let's stop here before it gets any crazier.
+
+## Conclusion
+
+That's the basics of React and Redux! There's still a lot more that each offers, whether it be handling middleware in Redux, or going through the other variety of ways of setting up components... not to mention React Router. Perhaps I'll tackle that another day, this time with some proper code samples rather than shoving everything in a README file. 
