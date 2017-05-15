@@ -211,3 +211,255 @@ let nameInstance = new FirstName;
 ```
 
 If you're not sure which to use, start with a functional component, and then use a class-based component when you need the additional functionality.
+
+
+### Event Handling
+
+Class-based Component: Whenever we want a component to have some internal record keeping and/or communicate to other components.
+```
+	// Define a new class, and give it all the functionality of React.Component
+	class FirstName extends React.Component{
+		render() {
+			return <input onChange={event => console.log(event.target.value)} />
+		}
+
+	}
+	let nameInstance = new name; // New Instance of the class
+```
+
+### States
+
+Essentially, state is a component's object that if changed, forces the component to re-render. This also forces the component's children to get re-rendered. State is an object that should be set in the constructor of the class-based component.
+
+```
+	// Define a new class, and give it all the functionality of React.Component
+	class FirstName extends React.Component{
+    	constructor(props) {
+        	super(props);
+            this.state = { name: '' };
+        }
+		render() {
+			return <input onChange={event => this.setState({ name: event.target.value })} />
+		}
+
+	}
+	let nameInstance = new FirstName;
+```
+
+#### Use setState when Changing the state value!
+
+Note how when I changed the value of this.state, I used 'this.setState()'. It is critical that you use this method WHENEVER you change the state value. Why? When you use setState, you're telling React, "hey, I'm changing the value of the state! Do whatever you do need to do knowing that." If you simply assign the value of state to something without setState, React has no way of knowing the state has changed.
+```
+// BAD!!! Do not do this.
+render() {
+	return <input onChange={event => this.state = { name: event.target.value } />
+}
+
+// The proper way to change state. 
+render() {
+	return <input onChange={event => this.setState({ name: event.target.value })} />
+}
+```
+
+### Controlled Field
+
+A controlled field is a field that is controlled by the state. This is in direct contrast to the previous section where the state is controlled by the input field. 
+
+```
+	// Define a new class, and give it all the functionality of React.Component
+	class FirstName extends React.Component{
+    	constructor(props) {
+        	super(props);
+            this.state = { name: '' };
+        }
+		render() {
+			return (
+              <input 
+              	value={this.state.term}
+              />
+            )
+		}
+
+	}
+	let nameInstance = new FirstName;
+```
+
+### Concept: Down-wards Data Flow and Passing Props
+
+Let's say we're creating a Broken Links Report. We have an input component that takes in the website domain you want to search for broken links, a table component that shows a subset of 100 broken links in the domain at a time, and a pagination component to show how many subsets of 100 broken links exist. 
+
+However, which component should be the one fetching the data? Should it be the input component or the table component? Actually, no. React follows a concept of "Down-wards Data Flow", in which the parent-most component should be the one fetching and distributing data. In many cases, this may be the application component in index.js. 
+
+If we go back to using the example we made in the section "Creating an Application and Adding a Component", we may want to pass a filter string from our parent App component to our child 'projects' component to filter the relevant projects. Note that we'll have to change App from a functional component to a class-based component because we're trying to pass state property of App to 'projects'. 
+
+```
+import React from 'react';
+import ReactDOM from 'react-dom';
+import projects from './components/projects.js';
+
+class App extends React.Component {
+	constructor(props){
+    	super(props);
+        this.state = { filter: ""};
+    }
+    render(){
+    	<div>
+          <p>Hello there!</p>
+          
+          <input onChange={event => this.setState({ filter: event.target.value }) />
+          <projects filter = {this.state.filter} />
+        </div>
+    }
+}
+
+ReactDOM.render(<App />, document.querySelect('#container'));
+
+```
+
+
+
+
+### Adding CSS to JSX
+
+When adding a CSS class to some JSX, you must refer to it as 'className'. React chose this particular keyword to not conflict with JavaScript ES6's 'class' keyword. 
+
+```
+class FirstName extends React.Component{
+  render() {
+    return <input className="col-xs-6 blue-form" />
+  }
+}
+```
+
+
+### Changing State Best Practice
+
+[Immutability is important](https://facebook.github.io/react/tutorial/tutorial.html#why-immutability-is-important), and Redux
+requires you avoid mutations. In fact, many packages used alongside Redux assume you never mutate the state. While adapting to
+immutability, you may want to use the dev-only package, [redux-immutable-state-invariant](https://github.com/leoasis/redux-immutable-state-invariant),
+to keep yourself and your teammates in check. 
+
+I suggest you use Object.assign. Not that this is not supported by IE11, so you may need the npm package, [object-assign](https://www.npmjs.com/package/object-assign).
+
+```
+this.state = { a : 0, b: 0 }
+
+...
+
+var change1 = { a: 1, b: 1 };
+var change2 = { b: 2 };
+var change3 = { c: 3 };
+
+var newState = Object.assign({}, JSON.parse(JSON.stringify(state)), change1, change2, change3);
+this.setState(newState) // { a : 1, b : 2, c : 3 }
+```
+
+Or, using TypeScript 2.1 or higher, Object spread syntax is possible. Not as performant, but gets the job done just as well.
+```
+let obj1 = { a: 0, b: 0 };
+var obj2 = {...obj, b: 1, c: 2}; // { a: 0, b: 1, c: 2 }
+```
+
+
+### Pass down Functions from Parent Components 
+
+As you know, variables can be passed down from parent components to child components. However, functions, as first-class citizens, also can.
+
+Take the below example in which you have a component two levels within a parent component that has a button that if clicked will change the 
+state of the parent component. 
+
+```
+// Parent Component
+class PickBestMovie extends React.Component {
+	constructor(){
+		this.state = {
+			username : 'Hyun Heo',
+			favMovie : null,
+		}
+	}
+	render(){
+		return(
+			<div>
+				<movie
+				 movieName="Finding Nemo"
+				 changeFavMovie={favMovie => this.setState({favMovie})} />
+			</div>		
+		)
+
+	}
+}
+
+// Child Component
+var movie = props => {
+	return(
+		<div>
+			<h2>{{props.movieName}} is the Best?</h2>
+			<movieSelect
+			 movieName={props.movieName}
+			 changeFavMovie={props.changeFavMovie} />
+		</div>
+	)
+}
+
+// Child's child Component 
+var movieSelect = props => {
+	return(
+		<button onClick={props.changeFavMovie(props.movieName)} >Hell yeah, man.</button>
+	)
+}
+
+```
+
+When you click the child's child's component, a button, the state in the parent component will be set. 
+
+NOTE: Passing callbacks like this should be done to two levels down MAX. Redux allows you to cut down 
+on the number of call backs you keep passing, but this method is still important to know as it's a great
+lightweight way of parent-child communication without bloating use of Redux. 
+
+
+### Multiple Child Components
+
+Going off the last section's example, we can't just have Finding Nemo be the only movie our users can select,
+though we know such art is peerless. Let's use ES6's 'Map'. Know that you may need Babel, or a polyfill to get
+the below example working. You could use a for loop too... but that's not in the spirit of React. 
+
+```
+// Parent Component
+class PickBestMovie extends React.Component {
+	constructor(){
+		this.state = {
+			movies : {'Finding Nemo', 'Finding Nemo 2', 'Finding Dory'}
+			favMovie : null,
+		}
+	}
+	render(){
+	
+		const movieItems = this.state.movies.map(movie => {
+			return (
+				<movie 
+				 movieName={movie}
+				 changeFavMovie={(favMovie) => this.setState({favMovie})}
+			)
+		})
+	
+		return (
+			<div>
+				<ul>
+					{movieItems}
+				</ul>
+			</div>
+		)
+	}
+}
+
+// Child Component
+var movie = props => {
+	return(
+		<li>
+			<h2>{{props.movieName}} is one of the Choices!</h2>
+			<button onClick={props.changeFavMovie(props.movieName)}>Pick Me!</button>
+		</li>
+	)
+}
+```
+
